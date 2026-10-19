@@ -1,0 +1,23 @@
+CREATE TABLE IF NOT EXISTS dwh.dim_date AS
+SELECT
+    TO_CHAR(d, 'YYYYMMDD')::INTEGER AS date_key,
+    d::DATE AS full_date,
+
+    EXTRACT(DAY FROM d)::INTEGER AS day,
+    EXTRACT(MONTH FROM d)::INTEGER AS month,
+    EXTRACT(QUARTER FROM d)::INTEGER AS quarter,
+    EXTRACT(YEAR FROM d)::INTEGER AS year,
+
+    EXTRACT(WEEK FROM d)::INTEGER AS week,
+
+    CASE
+        WHEN EXTRACT(MONTH FROM d) >= 9
+        THEN EXTRACT(YEAR FROM d)::INTEGER
+        ELSE EXTRACT(YEAR FROM d)::INTEGER - 1
+    END AS fiscal_year
+
+FROM GENERATE_SERIES(
+    '2022-01-01'::DATE,
+    '2026-12-31'::DATE,
+    INTERVAL '1 day'
+) AS d;
